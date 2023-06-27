@@ -1,40 +1,35 @@
-import { Component } from 'react';
+import { useEffect } from 'react';
 import { ModalStyled, Overlay } from './Modal.styled';
 import PropTypes from 'prop-types';
 
-class Modal extends Component {
-  componentDidMount = () => {
-    window.addEventListener('keydown', this.eventModal);
-  };
+const Modal = ({ largeFormat, onClose }) => {
+  useEffect(() => {
+    const eventModal = event => {
+      if (event.code === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', eventModal);
+    return () => {
+      window.removeEventListener('keydown', eventModal);
+    };
+  });
 
-  componentWillUnmount = () => {
-    window.removeEventListener('keydown', this.eventModal);
-  };
-
-  eventModal = e => {
-    if (e.code === 'Escape') {
-      this.props.onClose();
+  const onClickBackdrop = event => {
+    if (event.target === event.currentTarget) {
+      onClose();
     }
   };
 
-  onClickBackdrop = e => {
-    if (e.target === e.currentTarget) {
-      this.props.onClose();
-    }
-  };
+  return (
+    <Overlay onClick={onClickBackdrop}>
+      <ModalStyled>
+        <img src={largeFormat} alt="" />
+      </ModalStyled>
+    </Overlay>
+  );
+};
 
-  render() {
-    const { largeFormat } = this.props;
-
-    return (
-      <Overlay onClick={this.onClickBackdrop}>
-        <ModalStyled>
-          <img src={largeFormat} alt="" />
-        </ModalStyled>
-      </Overlay>
-    );
-  }
-}
 export default Modal;
 Modal.propTypes = {
   largeFormat: PropTypes.string.isRequired,
